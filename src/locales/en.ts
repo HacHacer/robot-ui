@@ -45,7 +45,7 @@ export default {
     'menu1-3': 'Menu 1-3',
     menu2: 'Menu 2',
     table: 'Table',
-    dynamicTable: 'Dynamic Table',
+    dynamicTable: 'Account',
     draggableTable: 'Draggable Table',
     inlineEditTable: 'Inline Edit Table',
     complexTable: 'Complex Table',
@@ -67,7 +67,7 @@ export default {
     pdf: 'PDF',
     exportZip: 'Export Zip',
     theme: 'Theme',
-    clipboard: 'Clipboard',
+    clipboard: 'Start Robot',
     i18n: 'I18n',
     externalLink: 'External Link',
     profile: 'Profile'

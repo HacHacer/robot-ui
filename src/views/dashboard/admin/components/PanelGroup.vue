@@ -11,7 +11,7 @@
     class="panel-group"
   >
     <el-col
-      :xs="12"
+      :xs="24"
       :sm="12"
       :lg="6"
       class="card-panel-col"
@@ -21,26 +21,31 @@
         @click="handleSetLineChartData('newVisitis')"
       >
         <div class="card-panel-icon-wrapper icon-people">
-          <img
-            :src="visits"
+          <el-button
+            type="primary"
+            icon="el-icon-refresh"
+            @click.stop="getStatus()"
           >
+            刷新状态
+          </el-button><br><br>
+          <el-button
+            type="primary"
+            icon="el-icon-refresh-right"
+            @click.stop="closeRobot()"
+          >
+            关闭交易
+          </el-button>
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            New Visits
+            机器人运行状态
           </div>
-          <CountTo
-            ref="myCount"
-            :start-val="0"
-            :end-val="102400"
-            :duration="2600"
-            class="card-panel-num"
-          />
+          <span class="card-panel-num">{{ robotStatus }}</span>
         </div>
       </div>
     </el-col>
     <el-col
-      :xs="12"
+      :xs="24"
       :sm="12"
       :lg="6"
       class="card-panel-col"
@@ -56,7 +61,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Messages
+            当日交易量
           </div>
           <CountTo
             :start-val="0"
@@ -68,7 +73,7 @@
       </div>
     </el-col>
     <el-col
-      :xs="12"
+      :xs="24"
       :sm="12"
       :lg="6"
       class="card-panel-col"
@@ -84,7 +89,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Purchases
+            当日交易额度
           </div>
           <CountTo
             :start-val="0"
@@ -96,7 +101,7 @@
       </div>
     </el-col>
     <el-col
-      :xs="12"
+      :xs="24"
       :sm="12"
       :lg="6"
       class="card-panel-col"
@@ -112,7 +117,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Shoppings
+            运行时间
           </div>
           <CountTo
             :start-val="0"
@@ -127,8 +132,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { useStore } from '@/store'
+import { defineComponent, onMounted, ref, watch } from 'vue'
 import { CountTo } from 'vue3-count-to'
+import { robotStatusRequest, stopRobot } from '@/apis/robot'
 import messages from '@/assets/images/home/messages.png'
 import purchases from '@/assets/images/home/purchases.png'
 import shoppings from '@/assets/images/home/shoppings.png'
@@ -142,10 +149,30 @@ export default defineComponent({
     const handleSetLineChartData = (type: string) => {
       emit('handle-set-line-chart-data', type)
     }
-
+    const store = useStore()
+    const robotStatus = ref('机器人已停止')
     const myCount = ref(null)
+    const getStatus = async() => {
+      const data = await robotStatusRequest()
+      if (!data?.message) return
+      robotStatus.value = data.message
+    }
+    const closeRobot = async() => {
+      const a = await stopRobot()
+      if (a.status) {
+        await getStatus()
+      }
+    }
+
+    watch(
+      () => store.state.user.exchange,
+      () => {
+        getStatus()
+      }
+    )
+
     onMounted(() => {
-      console.log((myCount.value as any).value)
+      getStatus()
     })
 
     return {
@@ -154,7 +181,10 @@ export default defineComponent({
       messages,
       purchases,
       visits,
-      shoppings
+      shoppings,
+      robotStatus,
+      closeRobot,
+      getStatus
     }
   }
 })
@@ -204,8 +234,9 @@ export default defineComponent({
 
     .card-panel-icon-wrapper {
       float: left;
-      margin: 14px 0 0 14px;
+      margin: 5px 0 0 5px;
       padding: 16px;
+      padding-right: 0;
       transition: all 0.38s ease-out;
       border-radius: 6px;
     }
@@ -236,21 +267,21 @@ export default defineComponent({
 }
 
 @media (max-width:550px) {
-  .card-panel-description {
-    display: none;
-  }
+  // .card-panel-description {
+  //   display: none;
+  // }
 
-  .card-panel-icon-wrapper {
-    float: none !important;
-    width: 100%;
-    height: 100%;
-    margin: 0 !important;
+  // .card-panel-icon-wrapper {
+  //   float: none !important;
+  //   width: 100%;
+  //   height: 100%;
+  //   margin: 0 !important;
 
-    svg {
-      display: block;
-      margin: 14px auto !important;
-      float: none !important;
-    }
-  }
+  //   svg {
+  //     display: block;
+  //     margin: 14px auto !important;
+  //     float: none !important;
+  //   }
+  // }
 }
 </style>

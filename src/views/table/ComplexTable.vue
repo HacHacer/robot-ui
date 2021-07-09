@@ -1,64 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.title"
-        :placeholder="t('table.title')"
-        style="width: 200px"
-        class="filter-item"
-        @keyup.enter="handleFilter"
-      />
-      <el-select
-        v-model="listQuery.importance"
-        :placeholder="t('table.importance')"
-        clearable
-        style="width: 120px"
-        class="filter-item"
-      >
-        <el-option
-          v-for="item in importanceOptions"
-          :key="item"
-          :label="item"
-          :value="item"
-        />
-      </el-select>
-      <el-select
-        v-model="listQuery.type"
-        :placeholder="t('table.type')"
-        clearable
-        class="filter-item"
-        style="width: 130px"
-      >
-        <el-option
-          v-for="item in calendarTypeOptions"
-          :key="item.key"
-          :label="item.displayName + '(' + item.key + ')'"
-          :value="item.key"
-        />
-      </el-select>
-      <el-select
-        v-model="listQuery.sort"
-        style="width: 140px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option
-          v-for="item in sortOptions"
-          :key="item.key"
-          :label="item.label"
-          :value="item.key"
-        />
-      </el-select>
       <el-button
-        v-waves
-        class="filter-item"
-        type="primary"
-        icon="el-icon-search"
-        @click="handleFilter"
-      >
-        {{ t("table.search") }}
-      </el-button>
-      <el-button
+        v-if="currentRole==='admin'"
         class="filter-item"
         style="margin-left: 10px"
         type="primary"
@@ -67,250 +11,106 @@
       >
         {{ t("table.add") }}
       </el-button>
-      <el-button
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="primary"
-        icon="el-icon-download"
-        @click="handleDownload"
-      >
-        {{ t("table.export") }}
-      </el-button>
-      <el-checkbox
-        v-model="showReviewer"
-        class="filter-item"
-        style="margin-left: 15px"
-        @change="tableKey = tableKey + 1"
-      >
-        {{ t("table.reviewer") }}
-      </el-checkbox>
     </div>
-
     <el-table
-      :key="tableKey"
       v-loading="listLoading"
       :data="list"
       border
       fit
       highlight-current-row
       style="width: 100%"
-      @sort-change="sortChange"
     >
       <el-table-column
-        :label="t('table.id')"
-        prop="id"
-        sortable="custom"
         align="center"
-        width="80"
-        :class-name="getSortClass('id')"
+        label="交易所名称"
       >
         <template #default="{row}">
-          <span>{{ row.id }}</span>
+          <span>{{ row.EXCHANGE }}</span>
         </template>
       </el-table-column>
       <el-table-column
-        :label="t('table.date')"
-        width="180px"
         align="center"
+        label="标签"
       >
         <template #default="{row}">
-          <span>{{ row.timestamp }}</span>
+          <span>{{ row.phone }}</span>
         </template>
       </el-table-column>
+
       <el-table-column
-        :label="t('table.title')"
-        min-width="150px"
-      >
-        <template #default="{row}">
-          <span
-            class="link-type"
-            @click="handleUpdate(row)"
-          >{{
-            row.title
-          }}</span>
-          <el-tag>{{ row.type }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="t('table.author')"
-        width="180px"
+
         align="center"
+        label="accessKey"
       >
         <template #default="{row}">
-          <span>{{ row.author }}</span>
+          <span>{{ row.accessKey }}</span>
         </template>
       </el-table-column>
+
       <el-table-column
-        v-if="showReviewer"
-        :label="t('table.reviewer')"
-        width="110px"
         align="center"
+        label="secretKey"
       >
         <template #default="{row}">
-          <span style="color: red">{{ row.reviewer }}</span>
+          <span>{{ row.secretKey }}</span>
         </template>
       </el-table-column>
       <el-table-column
-        :label="t('table.importance')"
-        width="105px"
-      >
-        <template #default="{row}">
-          <svg-icon
-            v-for="n in +row.importance"
-            :key="n"
-            name="star"
-            class="iconfont iconxing"
-          />
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="t('table.readings')"
         align="center"
-        width="95"
+        label="操作"
       >
-        <template #default="{row}">
-          <span
-            v-if="row.pageviews"
-            class="link-type"
-            @click="handleGetPageviews(row.pageviews)"
-          >{{ row.pageviews }}</span>
-          <span v-else>0</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="t('table.status')"
-        class-name="status-col"
-        width="100"
-      >
-        <template #default="{row}">
-          <el-tag :type="row.status">
-            {{ row.status }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="t('table.actions')"
-        align="center"
-        width="230"
-        class-name="fixed-width"
-      >
-        <template #default="{row, $index}">
+        <template #default="scope">
           <el-button
-            type="primary"
-            size="mini"
-            @click="handleUpdate(row)"
+            @click="handleInfo(scope.row)"
+            type="text"
+            size="small"
           >
-            {{ t("table.edit") }}
+            查看
           </el-button>
-          <el-button
-            v-if="row.status !== 'published'"
-            size="mini"
-            type="success"
-            @click="handleModifyStatus(row, 'published')"
+          <!-- <el-button
+            type="text"
+            size="small"
           >
-            {{ t("table.publish") }}
-          </el-button>
-          <el-button
-            v-if="row.status !== 'draft'"
-            size="mini"
-            @click="handleModifyStatus(row, 'draft')"
-          >
-            {{ t("table.draft") }}
-          </el-button>
-          <el-button
-            v-if="row.status !== 'deleted'"
-            size="mini"
-            type="danger"
-            @click="handleDelete(row, $index)"
-          >
-            {{ t("table.delete") }}
-          </el-button>
+            编辑
+          </el-button> -->
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      :total="total"
-      v-show="total > 0"
-      v-model:page="listQuery.page"
-      v-model:limit="listQuery.limit"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="currentPage4"
-      :page-sizes="[10, 20, 50, 100]"
-      layout="total, sizes, prev, pager, next, jumper"
-    />
-
     <el-dialog
-      :title="textMap[dialogStatus]"
+      title="新增账户"
       v-model="dialogFormVisible"
     >
       <el-form
         ref="dataForm"
         :rules="rules"
-        :model="tempArticleModel"
+        :model="tempAccountModel"
         label-position="left"
         label-width="100px"
         style="width: 400px; margin-left: 50px"
       >
         <el-form-item
-          :label="t('table.type')"
-          prop="type"
+          :label="t('account.phone')"
+          prop="phone"
         >
-          <el-select
-            v-model="tempArticleModel.type"
-            class="filter-item"
-            placeholder="Please select"
-          >
-            <el-option
-              v-for="item in calendarTypeOptions"
-              :key="item.key"
-              :label="item.displayName"
-              :value="item.key"
-            />
-          </el-select>
+          <el-input v-model="tempAccountModel.phone" />
         </el-form-item>
         <el-form-item
-          :label="t('table.date')"
-          prop="timestamp"
+          :label="t('account.accessKey')"
+          prop="accessKey"
         >
-          <el-date-picker
-            v-model="tempArticleModel.timestamp"
-            type="datetime"
-            placeholder="Please pick a date"
-          />
-        </el-form-item>
-        <el-form-item
-          :label="t('table.title')"
-          prop="title"
-        >
-          <el-input v-model="tempArticleModel.title" />
-        </el-form-item>
-        <el-form-item :label="t('table.status')">
-          <el-select
-            v-model="tempArticleModel.status"
-            class="filter-item"
-            placeholder="Please select"
-          >
-            <el-option
-              v-for="item in statusOptions"
-              :key="item"
-              :label="item"
-              :value="item"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="t('table.importance')">
-          <el-rate
-            v-model="tempArticleModel.importance"
-            :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
-            :max="3"
-            style="margin-top: 8px"
-          />
-        </el-form-item>
-        <el-form-item :label="t('table.remark')">
           <el-input
-            v-model="tempArticleModel.abstractContent"
+            v-model="tempAccountModel.accessKey"
+            :autosize="{minRows: 2, maxRows: 4}"
+            type="textarea"
+            placeholder="Please input"
+          />
+        </el-form-item>
+        <el-form-item
+          :label="t('account.secretKey')"
+          prop="secretKey"
+        >
+          <el-input
+            v-model="tempAccountModel.secretKey"
             :autosize="{minRows: 2, maxRows: 4}"
             type="textarea"
             placeholder="Please input"
@@ -323,41 +123,21 @@
         </el-button>
         <el-button
           type="primary"
-          @click="dialogStatus === 'create' ? createData() : updateData()"
+          @click="createData()"
         >
           {{ t("table.confirm") }}
         </el-button>
       </div>
     </el-dialog>
-
     <el-dialog
-      v-model:visible="dialogPageviewsVisible"
-      title="Reading statistics"
+      title="账户详情"
+      v-model="dialogInfoVisible"
     >
-      <el-table
-        :data="pageviewsData"
-        border
-        fit
-        highlight-current-row
-        style="width: 100%"
-      >
-        <el-table-column
-          prop="key"
-          label="Channel"
-        />
-        <el-table-column
-          prop="pageviews"
-          label="Pageviews"
-        />
-      </el-table>
-      <span class="dialog-footer">
-        <el-button
-          type="primary"
-          @click="dialogPageviewsVisible = false"
-        >{{
-          t("table.confirm")
-        }}</el-button>
-      </span>
+      <div class="dialog-footer">
+        <el-button @click="dialogInfoVisible = false">
+          {{ t("table.cancel") }}
+        </el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -370,47 +150,35 @@ import {
   ref,
   nextTick,
   onMounted,
-  unref
+  unref,
+  computed,
+  onBeforeMount
 } from 'vue'
 import { ElForm, ElMessage } from 'element-plus'
 import { cloneDeep } from 'lodash'
-import {
-  getArticles,
-  getPageviews,
-  createArticle,
-  updateArticle,
-  defaultArticleModel
-} from '@/apis/articles'
-import { ArticleModel } from '@/model/articleModel'
-
-import { exportJson2Excel } from '@/utils/excel'
-import { formatJson } from '@/utils'
+import { useStore } from '@/store'
+import { createAccount, getAllAccounts, getAccountInfo } from '@/apis/robot'
 import { useI18n } from 'vue-i18n'
 // import Pagination from '@/components/Pagination/index.vue'
 export default defineComponent({
-  components: {
-    // Pagination
-  },
   setup() {
+    const store = useStore()
     const { t } = useI18n()
+    const currentRole = ref('admin')
     const calendarTypeOptions = [
       { key: 'CN', displayName: 'China' },
       { key: 'US', displayName: 'USA' },
       { key: 'JP', displayName: 'Japan' },
       { key: 'EU', displayName: 'Eurozone' }
     ]
-
-    const calendarTypeKeyValue = calendarTypeOptions.reduce(
-      (acc: { [key: string]: string }, cur) => {
-        acc[cur.key] = cur.displayName
-        return acc
-      },
-      {}
-    ) as { [key: string]: string }
+    const roles = computed(() => {
+      return store.state.user.roles
+    })
+    console.log('roles :>> ', roles)
     const dataForm = ref(ElForm)
     const dataMap = reactive({
       tableKey: 0,
-      list: Array<ArticleModel>(),
+      list: [],
       total: 0,
       listLoading: true,
       listQuery: {
@@ -432,6 +200,7 @@ export default defineComponent({
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       dialogFormVisible: false,
+      dialogInfoVisible: false,
       dialogStatus: '',
       textMap: {
         update: 'Edit',
@@ -441,81 +210,70 @@ export default defineComponent({
       dialogPageviewsVisible: false,
       pageviewsData: [],
       rules: {
-        type: [
-          { required: true, message: 'type is required', trigger: 'change' }
+        phone: [
+          { required: true, message: 'phone is required', trigger: 'blur' }
         ],
-        timestamp: [
-          {
-            required: true,
-            message: 'timestamp is required',
-            trigger: 'change'
-          }
+        accessKey: [
+          { required: true, message: 'accessKey is required', trigger: 'blur' }
         ],
-        title: [
-          { required: true, message: 'title is required', trigger: 'blur' }
+        secretKey: [
+          { required: true, message: 'secretKey is required', trigger: 'blur' }
         ]
       },
       downloadLoading: false,
-      tempArticleModel: defaultArticleModel,
-      handleCurrentChange(page?: any) {
-        dataMap.getList(page)
+      tempAccountModel: {
+        phone: '',
+        accessKey: '',
+        secretKey: ''
       },
-      handleSizeChange(val: any) {
-        dataMap.getList(null, null, val)
+      confirmEdit(row: any) {
+        row.edit = false
+        row.originalTitle = row.title
+        ElMessage.success({
+          message: 'The title has been edited',
+          type: 'success'
+        })
       },
-      async getList(page?: any, total?: any, limit?: any) {
-        if (page) {
-          dataMap.listQuery.page = page
-        }
-        if (limit) {
-          dataMap.listQuery.limit = limit
-        }
-        console.log(total)
-        dataMap.listLoading = true
-        const data = await getArticles(dataMap.listQuery)
-        dataMap.list = data?.data.items ?? []
-        dataMap.total = data?.data.total ?? 0
+      cancelEdit(row: any) {
+        row.title = row.originalTitle
+        row.edit = false
 
+        ElMessage.success({
+          message: 'The title has been restored to the original value',
+          type: 'success'
+        })
+      },
+      // handleCurrentChange(page?: any) {
+      //   dataMap.getList(page)
+      // },
+      // handleSizeChange(val: any) {
+      //   dataMap.getList(null, null, val)
+      // },
+      async getList() {
+        dataMap.listLoading = true
+        const data = await getAllAccounts({ EXCHANGE: store.state.user.exchange })
+        dataMap.list = data ?? []
+        // dataMap.total = data?.data.total ?? 0
+        console.log('data :>> ', data)
         // Just to simulate the time of the request
         setTimeout(() => {
           dataMap.listLoading = false
         }, 0.5 * 1000)
       },
-      handleFilter() {
-        dataMap.listQuery.page = 1
-        dataMap.getList()
-      },
-      handleModifyStatus(row: any, status: string) {
-        ElMessage.success({
-          message: '操作成功',
-          type: 'success'
+      resetTempAccountModel() {
+        dataMap.tempAccountModel = cloneDeep({
+          phone: '',
+          accessKey: '',
+          secretKey: ''
         })
-        row.status = status
       },
-      sortChange(data: any) {
-        const { prop, order } = data
-        if (prop === 'id') {
-          dataMap.sortByID(order)
-        }
-      },
-      sortByID(order: string) {
-        if (order === 'ascending') {
-          dataMap.listQuery.sort = '+id'
-        } else {
-          dataMap.listQuery.sort = '-id'
-        }
-        dataMap.handleFilter()
-      },
-      getSortClass(key: string) {
-        const sort = dataMap.listQuery.sort
-        return sort === `+${key}` ? 'ascending' : 'descending'
-      },
-      resetTempArticleModel() {
-        dataMap.tempArticleModel = cloneDeep(defaultArticleModel)
+      async handleInfo(row: any) {
+        await getAccountInfo(row)
+        dataMap.dialogInfoVisible = true
       },
       handleCreate() {
         console.log('添加了')
-        dataMap.resetTempArticleModel()
+        dataMap.resetTempAccountModel()
         dataMap.dialogStatus = 'create'
         dataMap.dialogFormVisible = true
         nextTick(() => {
@@ -526,15 +284,14 @@ export default defineComponent({
         const form = unref(dataForm)
         form.validate(async(valid: any) => {
           if (valid) {
-            const ArticleModel = dataMap.tempArticleModel
-            ArticleModel.id = Math.round(Math.random() * 100) + 1024 // mock a id
-            ArticleModel.author = 'RCYJ_Scy'
-            const addData = await createArticle(ArticleModel)
-
-            if (addData?.data.id) {
-              alert(addData.data.id)
-              console.log(addData)
-              dataMap.list.unshift(addData.data)
+            const accountModle: any = dataMap.tempAccountModel
+            accountModle.EXCHANGE = store.state.user.exchange
+            accountModle.invitedKey = 'BNGJ_BNGJ'
+            const addData = await createAccount(accountModle)
+            console.log('addData :>> ', addData)
+            if (addData.code === 200) {
+              await dataMap.getList()
+              // dataMap.list.unshift(addData.data)
             }
 
             dataMap.dialogFormVisible = false
@@ -545,81 +302,18 @@ export default defineComponent({
             })
           }
         })
-      },
-
-      handleUpdate(row: any) {
-        dataMap.tempArticleModel = Object.assign({}, row)
-        dataMap.tempArticleModel.timestamp = +new Date(
-          dataMap.tempArticleModel.timestamp
-        )
-        dataMap.dialogStatus = 'update'
-        dataMap.dialogFormVisible = true
-        nextTick(() => {
-          (dataForm.value as typeof ElForm).clearValidate()
-        })
-      },
-      updateData() {
-        const form = unref(dataForm)
-        form.validate(async(valid: any) => {
-          if (valid) {
-            const tempData = Object.assign({}, dataMap.tempArticleModel)
-            tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-            console.log(tempData)
-            const data = await updateArticle(tempData)
-
-            console.log(data, '-----------------')
-            if (data) {
-              const index = dataMap.list.findIndex(
-                (v) => v.id === data.data.id
-              )
-              dataMap.list.splice(index, 1, data.data)
-            }
-
-            dataMap.dialogFormVisible = false
-            ElMessage.success({
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
-          }
-        })
-      },
-      handleDelete(row: any, index: number) {
-        ElMessage.success({
-          message: 'Delete Successfully',
-          type: 'success',
-          duration: 2000
-        })
-        dataMap.list.splice(index, 1)
-      },
-      async handleGetPageviews(pageviews: string) {
-        const data = await getPageviews({ pageviews })
-        dataMap.pageviewsData = data?.data.pageviews
-        dataMap.dialogPageviewsVisible = true
-      },
-      handleDownload() {
-        dataMap.downloadLoading = true
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = [
-          'timestamp',
-          'title',
-          'type',
-          'importance',
-          'status'
-        ]
-        const data = formatJson(filterVal, dataMap.list)
-        exportJson2Excel(tHeader, data, 'table-list')
-        dataMap.downloadLoading = false
-      },
-      typeFilter: (type: string) => {
-        return calendarTypeKeyValue[type]
       }
     })
     onMounted(() => {
       console.log(typeof ElForm)
-      dataMap.getList(null, null, 20)
+      dataMap.getList()
     })
-    return { t, ...toRefs(dataMap), dataForm }
+    onBeforeMount(() => {
+      if (!roles.value.includes('admin')) {
+        currentRole.value = 'editor'
+      }
+    })
+    return { t, ...toRefs(dataMap), dataForm, roles, currentRole }
   }
 })
 </script>

@@ -16,6 +16,7 @@ export type Mutations<S = UserState> = {
   [UserMutationTypes.SET_INTRODUCTION](state: S, introduction: string): void
   [UserMutationTypes.SET_ROLES](state: S, roles: string[]): void
   [UserMutationTypes.SET_EMAIL](state: S, email: string): void
+  [UserMutationTypes.SET_EXCHANGE](state: S, exchange: string): void
 }
 
 export const mutations: MutationTree<UserState> & Mutations = {
@@ -41,6 +42,10 @@ export const mutations: MutationTree<UserState> & Mutations = {
 
   [UserMutationTypes.SET_EMAIL](state: UserState, email: string) {
     state.email = email
+  },
+
+  [UserMutationTypes.SET_EXCHANGE](state: UserState, exchange: string) {
+    state.exchange = exchange
   }
 
 }

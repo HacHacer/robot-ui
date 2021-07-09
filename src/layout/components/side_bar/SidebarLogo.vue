@@ -34,7 +34,7 @@
           :src="Logo"
         >
         <h1 class="sidebar-title">
-          Vue<span style="color:#57CAEB">3</span>管理后台
+          <span style="color:#57CAEB">机器人</span>管理后台
         </h1>
       </router-link>
     </transition>

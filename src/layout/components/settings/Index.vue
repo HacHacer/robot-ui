@@ -13,43 +13,15 @@
       </h3>
 
       <div class="drawer-item">
-        <span>{{ t('settings.theme') }}</span>
-        <ThemePicker
-          style="float: right;height: 26px;margin: -3px 8px 0 0;"
-          @change="themeChange"
-        />
-      </div>
-
-      <div class="drawer-item">
-        <span>{{ t('settings.showTagsView') }}</span>
-        <el-switch
-          v-model="showTagsView"
-          class="drawer-switch"
-        />
-      </div>
-
-      <div class="drawer-item">
-        <span>{{ t('settings.showSidebarLogo') }}</span>
-        <el-switch
-          v-model="showSidebarLogo"
-          class="drawer-switch"
-        />
-      </div>
-
-      <div class="drawer-item">
-        <span>{{ t('settings.fixedHeader') }}</span>
-        <el-switch
-          v-model="fixedHeader"
-          class="drawer-switch"
-        />
-      </div>
-
-      <div class="drawer-item">
-        <span>{{ t('settings.sidebarTextTheme') }}</span>
-        <el-switch
-          v-model="sidebarTextTheme"
-          class="drawer-switch"
-        />
+        <el-radio
+          v-for="(item,index) in list"
+          :key="index"
+          v-model="exchange"
+          :label="item"
+          border
+        >
+          {{ item }}
+        </el-radio>
       </div>
     </div>
   </div>
@@ -58,46 +30,71 @@
 <script lang="ts">
 import { useStore } from '@/store'
 import { SettingsActionTypes } from '@/store/modules/settings/action-types'
+import { UserActionTypes } from '@/store/modules/user/action-types'
+
 import { defineComponent, reactive, toRefs, watch } from 'vue'
-import ThemePicker from '@/components/theme-picker/Index.vue'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
-  components: {
-    ThemePicker
-  },
   setup() {
+    const list = reactive(['jdex', 'hotcoin-global'])
     const store = useStore()
     const { t } = useI18n()
     const state = reactive({
-      fixedHeader: store.state.settings.fixedHeader,
+      exchange: store.state.user.exchange,
       showTagsView: store.state.settings.showTagsView,
       showSidebarLogo: store.state.settings.showSidebarLogo,
       sidebarTextTheme: store.state.settings.sidebarTextTheme,
       themeChange: (value: string) => {
-        store.dispatch(SettingsActionTypes.ACTION_CHANGE_SETTING, { key: 'theme', value })
+        store.dispatch(SettingsActionTypes.ACTION_CHANGE_SETTING, {
+          key: 'theme',
+          value
+        })
       }
     })
 
-    watch(() => state.fixedHeader, (value) => {
-      store.dispatch(SettingsActionTypes.ACTION_CHANGE_SETTING, { key: 'fixedHeader', value })
-    })
+    watch(
+      () => state.exchange,
+      (value) => {
+        console.log('value :>> ', value)
+        store.dispatch(UserActionTypes.ACTION_EXCHANGE, value)
+      }
+    )
 
-    watch(() => state.showTagsView, (value) => {
-      store.dispatch(SettingsActionTypes.ACTION_CHANGE_SETTING, { key: 'showTagsView', value })
-    })
+    watch(
+      () => state.showTagsView,
+      (value) => {
+        store.dispatch(SettingsActionTypes.ACTION_CHANGE_SETTING, {
+          key: 'showTagsView',
+          value
+        })
+      }
+    )
 
-    watch(() => state.showSidebarLogo, (value) => {
-      console.log(value)
+    watch(
+      () => state.showSidebarLogo,
+      (value) => {
+        console.log(value)
 
-      store.dispatch(SettingsActionTypes.ACTION_CHANGE_SETTING, { key: 'showSidebarLogo', value })
-    })
+        store.dispatch(SettingsActionTypes.ACTION_CHANGE_SETTING, {
+          key: 'showSidebarLogo',
+          value
+        })
+      }
+    )
 
-    watch(() => state.sidebarTextTheme, (value) => {
-      store.dispatch(SettingsActionTypes.ACTION_CHANGE_SETTING, { key: 'sidebarTextTheme', value })
-    })
+    watch(
+      () => state.sidebarTextTheme,
+      (value) => {
+        store.dispatch(SettingsActionTypes.ACTION_CHANGE_SETTING, {
+          key: 'sidebarTextTheme',
+          value
+        })
+      }
+    )
 
     return {
+      list,
       t,
       ...toRefs(state)
     }
@@ -114,19 +111,19 @@ export default defineComponent({
 
   .drawer-title {
     margin-bottom: 12px;
-    color: rgba(0, 0, 0, .85);
+    color: rgba(0, 0, 0, 0.85);
     font-size: 14px;
     line-height: 22px;
   }
 
   .drawer-item {
-    color: rgba(0, 0, 0, .65);
+    color: rgba(0, 0, 0, 0.65);
     font-size: 14px;
     padding: 12px 0;
   }
 
   .drawer-switch {
-    float: right
+    float: right;
   }
 }
 </style>

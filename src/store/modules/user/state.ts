@@ -14,6 +14,7 @@ export interface UserState{
     introduction: string
     roles: string[]
     email: string
+    exchange: string
 }
 
 export const state: UserState = {
@@ -22,5 +23,6 @@ export const state: UserState = {
   avatar: '',
   introduction: '',
   roles: [],
-  email: ''
+  email: '',
+  exchange: 'jdex'
 }

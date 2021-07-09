@@ -9,9 +9,14 @@
 import { useStore } from '@/store'
 import HttpClient, { HttpClientConfig } from 'axios-mapper'
 import networkConfig from '@/config/default/net.config'
+import exchangesUrl from '../../public/config.json'
+
 const https = (hasToken: Boolean = true) => {
+  const exchange = useStore().state.user.exchange
+  const host = exchangesUrl[exchange]
+  console.log('host :>> ', host)
   const config: HttpClientConfig = {
-    baseURL: networkConfig.host,
+    baseURL: host,
     headers: {
       token: hasToken ? useStore().state.user.token : ''
     }

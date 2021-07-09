@@ -12,7 +12,7 @@
     :style="{'top': buttonTop+'px','backgroundColor': theme}"
     @click="show= true"
   >
-    <i class="el-icon-setting" />
+    <i class="el-icon-sort" />
   </div>
   <el-drawer
     title="设置"
