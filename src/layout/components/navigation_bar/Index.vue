@@ -21,13 +21,6 @@
       <template v-if="device !== 'mobile'">
         <!-- <error-log class="errLog-container right-menu-item hover-effect" /> -->
         <Screenfull class="right-menu-item hover-effect" />
-        <el-tooltip
-          :content="t('navbar.size')"
-          effect="dark"
-          placement="bottom"
-        >
-          <SizeSelect class="right-menu-item hover-effect" />
-        </el-tooltip>
         <LangSelect class="right-menu-item hover-effect" />
       </template>
       <el-dropdown
@@ -42,32 +35,7 @@
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <router-link to="/profile/">
-              <el-dropdown-item>
-                {{ t("navbar.profile") }}
-              </el-dropdown-item>
-            </router-link>
-            <router-link to="/">
-              <el-dropdown-item>
-                {{ t("navbar.dashboard") }}
-              </el-dropdown-item>
-            </router-link>
-            <a
-              target="_blank"
-              href="https://github.com/rcyj-FED/vue3-composition-admin"
-            >
-              <el-dropdown-item>
-                {{ t("navbar.github") }}
-              </el-dropdown-item>
-            </a>
-            <a
-              target="_blank"
-              href="https://armour.github.io/vue-typescript-admin-docs/"
-            >
-              <el-dropdown-item>Docs</el-dropdown-item>
-            </a>
             <el-dropdown-item
-              divided
               @click="logout"
             >
               <span style="display:block;">
@@ -81,13 +49,11 @@
   </div>
 </template>
 
-<script>
+<script lang = "ts">
 import BreadCrumb from '@/components/bread-crumb/Index.vue'
 import Hamburger from '@/components/hamburger/Index.vue'
 import Screenfull from '@/components/screenfull/Index.vue'
 import LangSelect from '@/components/lang_select/Index.vue'
-import SizeSelect from '@/components/size_select/Index.vue'
-
 import { computed, reactive, toRefs } from 'vue'
 import { useStore } from '@/store'
 import { AppActionTypes } from '@/store/modules/app/action-types'
@@ -99,8 +65,7 @@ export default {
     BreadCrumb,
     Hamburger,
     Screenfull,
-    LangSelect,
-    SizeSelect
+    LangSelect
   },
   setup() {
     const store = useStore()
@@ -121,7 +86,7 @@ export default {
         store.dispatch(AppActionTypes.ACTION_TOGGLE_SIDEBAR, false)
       },
       logout: () => {
-        useStore().dispatch(UserActionTypes.ACTION_LOGIN_OUT)
+        store.dispatch(UserActionTypes.ACTION_LOGIN_OUT, undefined)
         router.push(`/login?redirect=${route.fullPath}`).catch(err => {
           console.warn(err)
         })

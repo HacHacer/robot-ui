@@ -2,11 +2,8 @@
  * @Description: 机器人相关接口
  * @Author: lfl
  */
-import { RootObject } from '@/model/rootObject'
-import { UserInfoModel, Users } from '@/model/userModel'
 import https from '@/utils/https'
-import { LoginModel } from '@/views/user-manager/login/model/loginModel'
-import { RequestParams, ContentType, Method } from 'axios-mapper'
+import { ContentType, Method } from 'axios-mapper'
 
 export const robotStatusRequest = () => {
   return https(false).request<any>(

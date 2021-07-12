@@ -13,7 +13,7 @@
     <el-col
       :xs="24"
       :sm="12"
-      :lg="6"
+      :lg="12"
       class="card-panel-col"
     >
       <div
@@ -47,7 +47,7 @@
     <el-col
       :xs="24"
       :sm="12"
-      :lg="6"
+      :lg="12"
       class="card-panel-col"
     >
       <div
@@ -55,13 +55,16 @@
         @click="handleSetLineChartData('messages')"
       >
         <div class="card-panel-icon-wrapper icon-message">
-          <img
-            :src="messages"
+          <el-button
+            type="primary"
+            icon="el-icon-s-marketing"
           >
+            查看七日交易量
+          </el-button>
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            当日交易量
+            24H交易量
           </div>
           <CountTo
             :start-val="0"
@@ -75,7 +78,7 @@
     <el-col
       :xs="24"
       :sm="12"
-      :lg="6"
+      :lg="12"
       class="card-panel-col"
     >
       <div
@@ -83,13 +86,16 @@
         @click="handleSetLineChartData('purchases')"
       >
         <div class="card-panel-icon-wrapper icon-money">
-          <img
-            :src="purchases"
+          <el-button
+            type="primary"
+            icon="el-icon-s-data"
           >
+            查看七日交易额度
+          </el-button>
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            当日交易额度
+            24H交易额度
           </div>
           <CountTo
             :start-val="0"
@@ -103,7 +109,7 @@
     <el-col
       :xs="24"
       :sm="12"
-      :lg="6"
+      :lg="12"
       class="card-panel-col"
     >
       <div
@@ -111,17 +117,20 @@
         @click="handleSetLineChartData('shoppings')"
       >
         <div class="card-panel-icon-wrapper icon-shopping">
-          <img
-            :src="shoppings"
+          <el-button
+            type="primary"
+            icon="el-icon-refresh-right"
           >
+            查看24H停止次数
+          </el-button>
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            运行时间
+            24H机器人停止次数
           </div>
           <CountTo
             :start-val="0"
-            :end-val="13600"
+            :end-val="400"
             :duration="3600"
             class="card-panel-num"
           />
@@ -136,9 +145,6 @@ import { useStore } from '@/store'
 import { defineComponent, onMounted, ref, watch } from 'vue'
 import { CountTo } from 'vue3-count-to'
 import { robotStatusRequest, stopRobot } from '@/apis/robot'
-import messages from '@/assets/images/home/messages.png'
-import purchases from '@/assets/images/home/purchases.png'
-import shoppings from '@/assets/images/home/shoppings.png'
 import visits from '@/assets/images/home/visits.png'
 export default defineComponent({
   components: {
@@ -178,10 +184,7 @@ export default defineComponent({
     return {
       handleSetLineChartData,
       myCount,
-      messages,
-      purchases,
       visits,
-      shoppings,
       robotStatus,
       closeRobot,
       getStatus

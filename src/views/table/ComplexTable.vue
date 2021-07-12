@@ -67,17 +67,19 @@
           >
             查看
           </el-button>
-          <!-- <el-button
+          <el-button
+            v-if="currentRole==='admin'"
             type="text"
             size="small"
+            @click="handleUpdate(scope.row)"
           >
             编辑
-          </el-button> -->
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-dialog
-      title="新增账户"
+      :title="textMap[dialogStatus]"
       v-model="dialogFormVisible"
     >
       <el-form
@@ -92,7 +94,10 @@
           :label="t('account.phone')"
           prop="phone"
         >
-          <el-input v-model="tempAccountModel.phone" />
+          <el-input
+            v-model="tempAccountModel.phone"
+            :disabled="dialogStatus==='update'"
+          />
         </el-form-item>
         <el-form-item
           :label="t('account.accessKey')"
@@ -133,6 +138,32 @@
       title="账户详情"
       v-model="dialogInfoVisible"
     >
+      <el-form
+        label-position="left"
+        label-width="100px"
+        style="width: 400px; margin-left: 50px"
+      >
+        <el-form-item
+          label="BFT"
+        >
+          {{ info.BFT_OVER }}
+        </el-form-item>
+        <el-form-item
+          label="BFT冻结"
+        >
+          {{ info.BFT_LOCK }}
+        </el-form-item>
+        <el-form-item
+          label="USDT"
+        >
+          {{ info.USDT_OVER }}
+        </el-form-item>
+        <el-form-item
+          label="USDT冻结"
+        >
+          {{ info.USDT_LOCK }}
+        </el-form-item>
+      </el-form>
       <div class="dialog-footer">
         <el-button @click="dialogInfoVisible = false">
           {{ t("table.cancel") }}
@@ -152,7 +183,8 @@ import {
   onMounted,
   unref,
   computed,
-  onBeforeMount
+  onBeforeMount,
+  watch
 } from 'vue'
 import { ElForm, ElMessage } from 'element-plus'
 import { cloneDeep } from 'lodash'
@@ -226,29 +258,7 @@ export default defineComponent({
         accessKey: '',
         secretKey: ''
       },
-      confirmEdit(row: any) {
-        row.edit = false
-        row.originalTitle = row.title
-        ElMessage.success({
-          message: 'The title has been edited',
-          type: 'success'
-        })
-      },
-      cancelEdit(row: any) {
-        row.title = row.originalTitle
-        row.edit = false
-
-        ElMessage.success({
-          message: 'The title has been restored to the original value',
-          type: 'success'
-        })
-      },
-      // handleCurrentChange(page?: any) {
-      //   dataMap.getList(page)
-      // },
-      // handleSizeChange(val: any) {
-      //   dataMap.getList(null, null, val)
-      // },
+      info: {},
       async getList() {
         dataMap.listLoading = true
         const data = await getAllAccounts({ EXCHANGE: store.state.user.exchange })
@@ -268,7 +278,8 @@ export default defineComponent({
         })
       },
       async handleInfo(row: any) {
-        await getAccountInfo(row)
+        dataMap.info = await getAccountInfo(row)
+        dataMap.dialogStatus = 'create'
         dataMap.dialogInfoVisible = true
       },
       handleCreate() {
@@ -302,12 +313,47 @@ export default defineComponent({
             })
           }
         })
+      },
+      handleUpdate(row: any) {
+        dataMap.tempAccountModel = Object.assign({}, row)
+        dataMap.dialogStatus = 'update'
+        dataMap.dialogFormVisible = true
+        nextTick(() => {
+          (dataForm.value as typeof ElForm).clearValidate()
+        })
+      },
+      updateData() {
+        const form = unref(dataForm)
+        form.validate(async(valid: any) => {
+          if (valid) {
+            const tempData = Object.assign({}, dataMap.tempAccountModel)
+            console.log(tempData)
+            const data = await createAccount(tempData)
+            console.log(data, '-----------------')
+            if (data.code === 200) {
+              await dataMap.getList()
+              // dataMap.list.unshift(addData.data)
+            }
+            dataMap.dialogFormVisible = false
+            ElMessage.success({
+              message: '更新成功',
+              type: 'success',
+              duration: 2000
+            })
+          }
+        })
       }
     })
     onMounted(() => {
       console.log(typeof ElForm)
       dataMap.getList()
     })
+    watch(
+      () => store.state.user.exchange,
+      () => {
+        dataMap.getList()
+      }
+    )
     onBeforeMount(() => {
       if (!roles.value.includes('admin')) {
         currentRole.value = 'editor'

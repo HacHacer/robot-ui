@@ -11,7 +11,6 @@ import { state, UserState } from './state'
 import { Mutations } from './mutations'
 import { UserMutationTypes } from './mutation-types'
 import { UserActionTypes } from './action-types'
-import { loginRequest, userInfoRequest } from '@/apis/user'
 import { removeToken, setToken } from '@/utils/cookies'
 import { PermissionActionType } from '../permission/action-types'
 import router, { resetRouter } from '@/router'
@@ -51,12 +50,12 @@ export const actions: ActionTree<UserState, RootState> & Actions = {
   ) {
     let { username, password } = userInfo
     username = username.trim()
-    if (username === 'admin' && password === 'admin') {
+    if (username === 'admin' && password === '13774666435') {
       const token = 'admin-token'
       setToken(token)
       commit(UserMutationTypes.SET_TOKEN, token)
     }
-    if (username === 'editor') {
+    if (username === 'user') {
       const token = 'editor-token'
       setToken(token)
       commit(UserMutationTypes.SET_TOKEN, token)

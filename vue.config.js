@@ -26,6 +26,7 @@ module.exports = {
   outputDir,
   lintOnSave,
   transpileDependencies,
+  productionSourceMap: false,
   devServer: {
     hot: true,
     port: devPort,

@@ -12,36 +12,6 @@
     <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;border-radius: 8px;">
       <LineChart :chart-data="lineChartData" />
     </el-row>
-
-    <el-row :gutter="32">
-      <el-col
-        :xs="24"
-        :sm="24"
-        :lg="8"
-      >
-        <div class="chart-wrapper">
-          <RadarChart />
-        </div>
-      </el-col>
-      <el-col
-        :xs="24"
-        :sm="24"
-        :lg="8"
-      >
-        <div class="chart-wrapper">
-          <PieChart />
-        </div>
-      </el-col>
-      <el-col
-        :xs="24"
-        :sm="24"
-        :lg="8"
-      >
-        <div class="chart-wrapper">
-          <BarChart />
-        </div>
-      </el-col>
-    </el-row>
   </div>
 </template>
 
@@ -49,16 +19,10 @@
 import { ref } from 'vue'
 import PanelGroup from './components/PanelGroup.vue'
 import LineChart from './components/LineChart.vue'
-import RadarChart from './components/RadarChart.vue'
-import PieChart from './components/PieChart.vue'
-import BarChart from './components/BarChart.vue'
 export default {
   components: {
     PanelGroup,
-    LineChart,
-    RadarChart,
-    PieChart,
-    BarChart
+    LineChart
   },
   setup() {
     const data = {

@@ -8,7 +8,6 @@
 
 import { useStore } from '@/store'
 import HttpClient, { HttpClientConfig } from 'axios-mapper'
-import networkConfig from '@/config/default/net.config'
 import exchangesUrl from '../../public/config.json'
 
 const https = (hasToken: Boolean = true) => {

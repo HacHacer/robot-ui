@@ -8,15 +8,6 @@
 
 <template>
   <div class="login-container">
-    <video
-      poster="../../../assets/images/login/video-cover.jpeg"
-      loop
-      autoplay
-      muted
-    >
-      <source src="../../../assets/images/login/night.mp4">
-    </video>
-
     <el-form
       ref="loginFormRef"
       :model="loginForm"
@@ -92,37 +83,7 @@
       >
         {{ t("login.logIn") }}
       </el-button>
-
-      <div style="position:relative">
-        <div class="tips">
-          <span>{{ t("login.username") }} : admin </span>
-          <span>{{ t("login.password") }} : {{ t("login.any") }} </span>
-        </div>
-        <div class="tips">
-          <span>{{ t("login.username") }} : editor </span>
-          <span>{{ t("login.password") }} : {{ t("login.any") }} </span>
-        </div>
-
-        <el-button
-          class="thirdparty-button"
-          type="primary"
-          @click="showDialog = true"
-        >
-          {{ t("login.thirdparty") }}
-        </el-button>
-      </div>
     </el-form>
-
-    <el-dialog
-      :title="t('login.thirdparty')"
-      v-model="showDialog"
-    >
-      {{ t("login.thirdpartyTips") }}
-      <br>
-      <br>
-      <br>
-      <SocialSign />
-    </el-dialog>
   </div>
 </template>
 
@@ -137,7 +98,6 @@ import {
   toRefs
 } from 'vue'
 import LangSelect from '@/components/lang_select/Index.vue'
-import SocialSign from './components/SocialSignin.vue'
 import { isValidUsername } from '@/utils/validate'
 import { useRoute, LocationQuery, useRouter } from 'vue-router'
 import { useStore } from '@/store'
@@ -145,8 +105,7 @@ import { UserActionTypes } from '@/store/modules/user/action-types'
 import { useI18n } from 'vue-i18n'
 export default defineComponent({
   components: {
-    LangSelect,
-    SocialSign
+    LangSelect
   },
   setup() {
     const userNameRef = ref(null)
@@ -158,8 +117,8 @@ export default defineComponent({
     const { t } = useI18n()
     const state = reactive({
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '',
+        password: ''
       },
       loginRules: {
         username: [{ validator: userNameRef, trigger: 'blur' }],
@@ -313,7 +272,7 @@ export default defineComponent({
   height: 100%;
   width: 100%;
   overflow: hidden;
-  // background-color: $loginBg;
+  background-color: $loginBg;
   video {
     position: absolute;
     /* Vertical and Horizontal center*/
