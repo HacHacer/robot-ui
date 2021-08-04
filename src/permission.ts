@@ -8,7 +8,7 @@
 
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-// import { useI18n } from 'vue-i18n'
+// 
 import router from '@/router'
 import { RouteLocationNormalized } from 'vue-router'
 import { useStore } from './store'

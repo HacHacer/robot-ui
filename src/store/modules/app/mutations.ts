@@ -41,8 +41,6 @@ export const mutations: MutationTree<AppState> & Mutations = {
   },
 
   [AppMutationTypes.SET_LANGUAGE](state: AppState, language: string) {
-    state.language = language
-    setLanguage(state.language)
   },
 
   [AppMutationTypes.SET_SIZE](state: AppState, size: string) {

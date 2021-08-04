@@ -34,9 +34,9 @@ export const getAccounts = (params: any) => {
 export const getAccountInfo = (params: any) => {
   return https().request<any>(
     'account/getMyInfo',
-    Method.GET,
+    Method.POST,
     params,
-    ContentType.form
+    ContentType.json
   )
 }
 export const getAllAccounts = (params: any) => {
@@ -53,6 +53,24 @@ export const stopRobot = () => {
     'strategy/stopAutoTrade',
     Method.GET,
     undefined,
+    ContentType.json
+  )
+}
+
+export const getTransactionData = (params: any) => {
+  return https().request<any>(
+    'transaction/getTransactionData',
+    Method.GET,
+    params,
+    ContentType.form
+  )
+}
+
+export const deleteUserKey = (params: any) => {
+  return https().request<any>(
+    'user/delteUserKey',
+    Method.POST,
+    params,
     ContentType.json
   )
 }

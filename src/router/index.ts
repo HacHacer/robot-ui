@@ -44,7 +44,7 @@ export const constantRoutes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "dashboard" */ '@/views/dashboard/Index.vue'),
         name: 'Dashboard',
         meta: {
-          title: 'dashboard',
+          title: '首页',
           icon: '#icondashboard',
           affix: true
         }

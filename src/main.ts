@@ -27,5 +27,5 @@ console.log(process.env.VUE_APP_BASE_API)
 Object.keys(directives).forEach(key => {
   app.directive(key, (directives as { [key: string ]: Directive })[key])
 })
-
+ 
 app.use(store).use(router).mount('#app')

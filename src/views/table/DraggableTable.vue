@@ -102,12 +102,12 @@
     <!-- $t is vue-i18n global function to translate lang (lang in @/lang)  -->
     <div class="show-d">
       <el-tag style="margin-right: 12px">
-        {{ t("table.dragTips1") }} :
+        提示 :
       </el-tag>
       {{ oldList }}
     </div>
     <div class="show-d">
-      <el-tag>{{ t("table.dragTips2") }} :</el-tag> {{ newList }}
+      <el-tag>提示2 :</el-tag> {{ newList }}
     </div>
   </div>
 </template>
@@ -117,12 +117,10 @@ import { reactive, defineComponent, nextTick, onMounted, toRefs } from 'vue'
 import { ArticleModel } from '@/model/articleModel'
 
 import Sortable from 'sortablejs'
-import { getArticles } from '@/apis/articles'
-import { useI18n } from 'vue-i18n'
+
 export default defineComponent({
   setup() {
     let sortable: Sortable | null = null
-    const { t } = useI18n()
     const dataMap = reactive({
       list: Array<ArticleModel>(),
       listLoading: true,
@@ -135,12 +133,12 @@ export default defineComponent({
       },
       async getList() {
         dataMap.listLoading = true
-        const data = await getArticles(this.listQuery)
-        dataMap.list = data?.data.items ?? []
+        const data = null
+        dataMap.list = data ?? []
         setTimeout(() => {
           dataMap.listLoading = false
         }, 0.5 * 1000)
-        dataMap.total = data?.data.total ?? 0
+        dataMap.total = data ?? 0
         dataMap.oldList = dataMap.list.map((v) => v.id)
         dataMap.newList = this.oldList.slice()
         nextTick(() => {
@@ -171,7 +169,7 @@ export default defineComponent({
     onMounted(() => {
       dataMap.getList()
     })
-    return { t, sortable, ...toRefs(dataMap) }
+    return { sortable, ...toRefs(dataMap) }
   }
 })
 </script>

@@ -17,7 +17,7 @@
   <el-drawer
     title="设置"
     v-model="show"
-    size="330px"
+    size="300px"
     :direction="direction"
     destroy-on-close
   >

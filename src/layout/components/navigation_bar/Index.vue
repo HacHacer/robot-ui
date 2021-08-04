@@ -39,7 +39,7 @@
               @click="logout"
             >
               <span style="display:block;">
-                {{ t("navbar.logOut") }}
+                退出登录
               </span>
             </el-dropdown-item>
           </el-dropdown-menu>
@@ -57,7 +57,7 @@ import LangSelect from '@/components/lang_select/Index.vue'
 import { computed, reactive, toRefs } from 'vue'
 import { useStore } from '@/store'
 import { AppActionTypes } from '@/store/modules/app/action-types'
-import { useI18n } from 'vue-i18n'
+
 import { UserActionTypes } from '@/store/modules/user/action-types'
 import { useRoute, useRouter } from 'vue-router'
 export default {
@@ -71,7 +71,6 @@ export default {
     const store = useStore()
     const route = useRoute()
     const router = useRouter()
-    const { t } = useI18n()
     const sidebar = computed(() => {
       return store.state.app.sidebar
     })
@@ -96,8 +95,7 @@ export default {
       sidebar,
       device,
       avatar,
-      ...toRefs(state),
-      t
+      ...toRefs(state)
     }
   }
 }

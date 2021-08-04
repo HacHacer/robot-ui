@@ -19,7 +19,7 @@ const ProfileRouter: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "clipboard" */ '@/views/clipboard/Index.vue'),
         name: 'Clipboard',
         meta: {
-          title: 'clipboard',
+          title: '启动机器人',
           icon: '#iconcopy'
         }
       }

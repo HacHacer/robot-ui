@@ -18,7 +18,7 @@
     >
       <div class="title-container">
         <h3 class="title">
-          {{ t("login.title") }}
+          登录
         </h3>
         <LangSelect
           :isWhite="true"
@@ -33,7 +33,7 @@
         <el-input
           ref="userNameRef"
           v-model="loginForm.username"
-          :placeholder="t('login.username')"
+          placeholder="username"
           name="username"
           type="text"
           tabindex="1"
@@ -56,7 +56,7 @@
             ref="passwordRef"
             v-model="loginForm.password"
             :type="passwordType"
-            :placeholder="t('login.password')"
+            placeholder="password"
             name="password"
             tabindex="2"
             autocomplete="on"
@@ -81,7 +81,7 @@
         style="width:100%; margin-bottom:30px;"
         @click.prevent="handleLogin"
       >
-        {{ t("login.logIn") }}
+        登录
       </el-button>
     </el-form>
   </div>
@@ -102,7 +102,7 @@ import { isValidUsername } from '@/utils/validate'
 import { useRoute, LocationQuery, useRouter } from 'vue-router'
 import { useStore } from '@/store'
 import { UserActionTypes } from '@/store/modules/user/action-types'
-import { useI18n } from 'vue-i18n'
+
 export default defineComponent({
   components: {
     LangSelect
@@ -114,7 +114,6 @@ export default defineComponent({
     const router = useRouter()
     const route = useRoute()
     const store = useStore()
-    const { t } = useI18n()
     const state = reactive({
       loginForm: {
         username: '',
@@ -215,8 +214,7 @@ export default defineComponent({
       passwordRef,
       loginFormRef,
       ...toRefs(state),
-      ...toRefs(methods),
-      t
+      ...toRefs(methods)
     }
   }
 })

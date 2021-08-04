@@ -11,7 +11,7 @@
       type="primary"
       @click="handleCreateRole"
     >
-      {{ t("permission.createRole") }}
+     添加角色
     </el-button>
 
     <el-table
@@ -55,14 +55,14 @@
             size="small"
             @click="handleEdit(scope)"
           >
-            {{ t("permission.editPermission") }}
+          编辑角色
           </el-button>
           <el-button
             type="danger"
             size="small"
             @click="handleDelete(scope)"
           >
-            {{ t("permission.delete") }}
+            删除角色
           </el-button>
         </template>
       </el-table-column>
@@ -108,13 +108,13 @@
           type="danger"
           @click="dialogVisible = false"
         >
-          {{ t("permission.cancel") }}
+          取消
         </el-button>
         <el-button
           type="primary"
           @click="confirmRole"
         >
-          {{ t("permission.confirm") }}
+         确定
         </el-button>
       </div>
     </el-dialog>
@@ -124,9 +124,8 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, reactive, toRefs, ref, nextTick, getCurrentInstance } from 'vue'
 import { RouteRecordRaw } from 'vue-router'
-import { getRoutes, getRoles, delRole, updateRole, createRole } from '@/apis/roles'
 import { resolve } from 'path'
-import { useI18n } from 'vue-i18n'
+
 import editRole from './editRole'
 import { cloneDeep } from 'lodash'
 interface Role {
@@ -154,7 +153,6 @@ export default defineComponent({
   setup() {
     const { ctx } = getCurrentInstance() as any
     const treeRef = ref<HTMLInputElement | null>(null)
-    const { t } = useI18n()
     const { flattenRoutes } = editRole()
 
     const onlyOneShowingChildFunc = (children: RouteRecordRaw[] = [], parent: RouteRecordRaw) => {
@@ -211,7 +209,7 @@ export default defineComponent({
           title: '',
           path: ''
         }
-        tmp.title = route.meta ? t(`route.${route.meta.title}`).toString() : ''
+        tmp.title = route.meta ? route.meta.title.toString() : ''
         tmp.path = route.path
         if (route.children) {
           tmp.children = generateTreeData(route.children)
@@ -280,13 +278,7 @@ export default defineComponent({
           cancelButtonText: 'Cancel',
           type: 'warning'
         }).then(async() => {
-          delRole(row.key).then((res) => {
-            state.rolesList.splice($index, 1)
-            ctx.$message({
-              type: 'success',
-              message: res?.data
-            })
-          })
+          console.log('1 :>> ', 1)
         })
       }
     })
@@ -295,21 +287,6 @@ export default defineComponent({
       const isEdit = state.dialogType === 'edit'
       const checkedKeys = (treeRef.value as any).getCheckedKeys()
       state.role.routes = generateTree(cloneDeep(state.serviceRoutes as RouteRecordRaw[]), '/', checkedKeys)
-      if (isEdit) {
-        await updateRole(state.role.key, { role: state.role }).then(async() => {
-          for (let index = 0; index < state.rolesList.length; index++) {
-            if (state.rolesList[index].key === state.role.key) {
-              state.rolesList.splice(index, 1, Object.assign({}, state.role))
-              break
-            }
-          }
-        })
-      } else {
-        await createRole({ role: state.role }).then(async(res) => {
-          state.role.key = res?.data.key
-          state.rolesList.push(state.role)
-        })
-      }
 
       const { description, key, name } = state.role
       state.dialogVisible = false
@@ -326,16 +303,11 @@ export default defineComponent({
     }
 
     const getServiceRoutes = () => {
-      getRoutes().then((res) => {
-        state.serviceRoutes = res?.data.routes as any as RouteRecordRaw[]
-        state.reshapedRoutes = getReshapeRoutes(res?.data.routes as any as RouteRecordRaw[])
-      })
+      console.log('1 :>> ', 1)
     }
 
     const getRolesList = () => {
-      getRoles().then((res) => {
-        state.rolesList = res?.data.items as any as Role[]
-      })
+      console.log('1 :>> ', 1)
     }
 
     onBeforeMount(() => {
@@ -346,7 +318,6 @@ export default defineComponent({
     const routesTreeData = computed(() => generateTreeData(state.reshapedRoutes as any as RouteRecordRaw[]))
 
     return {
-      t,
       confirmRole,
       ...toRefs(state),
       treeRef,

@@ -24,12 +24,16 @@
           placeholder="请选择账户1"
           @change="change($event)"
         >
-          <el-option
+          <template
             v-for="item in list"
             :key="item.id"
-            :label="item.phone"
-            :value="item.id"
-          />
+          >
+            <el-option
+              v-if="item.id!==ruleForm.key2"
+              :label="item.phone"
+              :value="item.id"
+            />
+          </template>
         </el-select>
       </el-form-item>
       <el-form-item
@@ -40,23 +44,42 @@
           v-model="ruleForm.key2"
           placeholder="请选择账户2"
         >
-          <el-option
+          <template
             v-for="item in list"
             :key="item.id"
-            :label="item.phone"
-            :value="item.id"
-          />
+          >
+            <el-option
+              v-if="item.id!==ruleForm.key1"
+              :label="item.phone"
+              :value="item.id"
+            />
+          </template>
         </el-select>
       </el-form-item>
       <el-form-item
         label="间隔时间"
-        prop="minAmount"
+        prop="interval"
       >
-        <el-input
+        <el-select
+          v-model="ruleForm.interval"
+          multiple
+          filterable
+          allow-create
+          default-first-option
+          placeholder="请选择文章标签"
+        >
+          <el-option
+            v-for="(item, index) in options"
+            :key="index"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+        <!-- <el-input
           type="age"
           v-model.number="ruleForm.interval"
           autocomplete="off"
-        />
+        /> -->
       </el-form-item>
       <el-form-item
         label="Market"
@@ -129,7 +152,7 @@
 <script lang="ts">
 import { stopRobot, startAutoTrade, getAllAccounts } from '@/apis/robot'
 import { useStore } from '@/store'
-import { ElForm } from 'element-plus'
+import { ElForm, ElMessage } from 'element-plus'
 import {
   computed, defineComponent,
   reactive, onBeforeMount, ref, toRefs, unref, onMounted, watch
@@ -146,13 +169,13 @@ export default defineComponent({
     const dataMap = reactive({
       list: [],
       options: [{
-        value: 20,
+        value: '20',
         label: '20s'
       }, {
-        value: 40,
+        value: '40',
         label: '40s'
       }, {
-        value: 60,
+        value: '60',
         label: '60s'
       }],
       ruleForm: {
@@ -161,7 +184,7 @@ export default defineComponent({
         date1: '',
         maxAmount: 300,
         minAmount: 100,
-        interval: 20,
+        interval: '',
         market: ''
       },
       rules: {
@@ -173,7 +196,7 @@ export default defineComponent({
         ],
         interval: [
           { required: true, message: '请选择时间间隔', trigger: 'change' },
-          { type: 'number', message: '必须为数字值' }
+          // { type: 'number', message: '必须为数字值' }
         ],
         maxAmount: [
           { required: true, message: '不能为空' },
@@ -202,8 +225,8 @@ export default defineComponent({
             accountModle.EXCHANGE = store.state.user.exchange
             accountModle.duration = Date.parse(accountModle.date1)
             accountModle.isPlanning = false
-            const arr = [accountModle.interval + '']
-            accountModle.interval = [...arr]
+            // const arr = [accountModle.interval + '']
+            // accountModle.interval = accountModle.interval.value
             // accountModle.timeRange = []
             const key1: any = dataMap.list.find((item: any) => item.id === accountModle.key1)
             const key2: any = dataMap.list.find((item: any) => item.id === accountModle.key2)
@@ -214,9 +237,16 @@ export default defineComponent({
             delete accountModle?.key1
             delete accountModle?.key2
             delete accountModle?.date1
-            await stopRobot()
-            await startAutoTrade(accountModle)
-            form.resetFields()
+            const result = await startAutoTrade(accountModle)
+            if (result?.status === 1) {
+              ElMessage({
+                message: '成功开启机器人交易',
+                type: 'success'
+              })
+              form.resetFields()
+            } else {
+              ElMessage.error('出错了')
+            }
             console.log('object :>> ', accountModle)
           } else {
             console.log('error submit!!')

@@ -9,7 +9,7 @@
         icon="el-icon-edit"
         @click="handleCreate"
       >
-        {{ t("table.add") }}
+        添加
       </el-button>
     </div>
     <el-table
@@ -75,6 +75,20 @@
           >
             编辑
           </el-button>
+          <el-popconfirm
+            v-if="currentRole==='admin'"
+            title="确定删除吗？"
+            @confirm="handleDelete(scope.row)"
+          >
+            <template #reference>
+              <el-button
+                type="text"
+                size="small"
+              >
+                删除
+              </el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -91,7 +105,7 @@
         style="width: 400px; margin-left: 50px"
       >
         <el-form-item
-          :label="t('account.phone')"
+          label="电话"
           prop="phone"
         >
           <el-input
@@ -100,7 +114,7 @@
           />
         </el-form-item>
         <el-form-item
-          :label="t('account.accessKey')"
+          label="accessKey"
           prop="accessKey"
         >
           <el-input
@@ -111,7 +125,7 @@
           />
         </el-form-item>
         <el-form-item
-          :label="t('account.secretKey')"
+          label="secretKey"
           prop="secretKey"
         >
           <el-input
@@ -124,13 +138,13 @@
       </el-form>
       <div class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          {{ t("table.cancel") }}
+          取消
         </el-button>
         <el-button
           type="primary"
           @click="createData()"
         >
-          {{ t("table.confirm") }}
+          确定
         </el-button>
       </div>
     </el-dialog>
@@ -166,7 +180,7 @@
       </el-form>
       <div class="dialog-footer">
         <el-button @click="dialogInfoVisible = false">
-          {{ t("table.cancel") }}
+          取消
         </el-button>
       </div>
     </el-dialog>
@@ -189,13 +203,12 @@ import {
 import { ElForm, ElMessage } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import { useStore } from '@/store'
-import { createAccount, getAllAccounts, getAccountInfo } from '@/apis/robot'
-import { useI18n } from 'vue-i18n'
+import { createAccount, getAllAccounts, getAccountInfo, deleteUserKey } from '@/apis/robot'
+
 // import Pagination from '@/components/Pagination/index.vue'
 export default defineComponent({
   setup() {
     const store = useStore()
-    const { t } = useI18n()
     const currentRole = ref('admin')
     const calendarTypeOptions = [
       { key: 'CN', displayName: 'China' },
@@ -259,6 +272,7 @@ export default defineComponent({
         secretKey: ''
       },
       info: {},
+      visible: true,
       async getList() {
         dataMap.listLoading = true
         const data = await getAllAccounts({ EXCHANGE: store.state.user.exchange })
@@ -281,6 +295,27 @@ export default defineComponent({
         dataMap.info = await getAccountInfo(row)
         dataMap.dialogStatus = 'create'
         dataMap.dialogInfoVisible = true
+      },
+      async handleDelete(row: any) {
+        const params = {
+          EXCHANGE: store.state.user.exchange,
+          phone: row.phone
+        }
+        const result = await deleteUserKey(params)
+        console.log('result :>> ', result)
+        if (result.code === 200) {
+          await dataMap.getList()
+          ElMessage.success({
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+          // dataMap.list.unshift(addData.data)
+        } else {
+          ElMessage.error(
+            '出错了'
+          )
+        }
       },
       handleCreate() {
         console.log('添加了')
@@ -359,7 +394,7 @@ export default defineComponent({
         currentRole.value = 'editor'
       }
     })
-    return { t, ...toRefs(dataMap), dataForm, roles, currentRole }
+    return { ...toRefs(dataMap), dataForm, roles, currentRole }
   }
 })
 </script>

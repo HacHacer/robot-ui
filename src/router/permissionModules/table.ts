@@ -21,7 +21,7 @@ const tableRouter: Array<RouteRecordRaw> = [
             /* webpackChunkName: "clipboard" */ '@/views/table/ComplexTable.vue'
           ),
         name: 'DynamicTable',
-        meta: { title: 'dynamicTable', icon: '#iconcopy' }
+        meta: { title: '账户管理', icon: '#iconcopy' }
       }
     ]
   }

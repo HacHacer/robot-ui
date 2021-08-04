@@ -82,7 +82,7 @@
       style="margin-top:60px;"
     >
       <aside>
-        {{ t('permission.tips') }}
+        提示
         <br> e.g.
       </aside>
 
@@ -136,7 +136,7 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue'
 import { checkPermission } from '@/utils/permission' // Use permission directly
-import { useI18n } from 'vue-i18n'
+
 import SwitchRoles from './components/SwitchRoles.vue'
 
 export default defineComponent({
@@ -144,7 +144,6 @@ export default defineComponent({
     SwitchRoles
   },
   setup() {
-    const { t } = useI18n()
     const state = reactive({
       key: 1,
       checkPermission: checkPermission,
@@ -154,7 +153,6 @@ export default defineComponent({
     })
 
     return {
-      t,
       ...toRefs(state)
     }
   }

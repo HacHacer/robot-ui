@@ -19,7 +19,7 @@
 import { useStore } from '@/store'
 import { computed, defineComponent, getCurrentInstance, reactive, toRefs, watch } from 'vue'
 import Loading from '@/utils/loading'
-import { useI18n } from 'vue-i18n'
+
 const version = require('element-plus/package.json').version // element-ui version from node_modules
 const ORIGINAL_THEME = '#409EFF' // default color
 
@@ -28,7 +28,6 @@ export default defineComponent({
   setup(_, context) {
     const { loading } = Loading()
     const store = useStore()
-    const { t } = useI18n()
     const ctx = getCurrentInstance() as any
     const state = reactive({
       chalk: '',
@@ -103,7 +102,7 @@ export default defineComponent({
         const oldValue = state.chalk ? state.theme : ORIGINAL_THEME
         const themeCluster = getThemeCluster(value.replace('#', ''))
         const originalCluster = getThemeCluster(oldValue.replace('#', ''))
-        const loadingInstance = loading(t('theme.loading'))
+        const loadingInstance = loading('加载中')
         if (!state.chalk) {
           const url = `https://unpkg.com/element-plus@${version}/lib/theme-chalk/index.css`
           await getCSSString(url, 'chalk')

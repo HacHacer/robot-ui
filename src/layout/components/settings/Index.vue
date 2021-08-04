@@ -9,19 +9,24 @@
   <div class="drawer-container">
     <div>
       <h3 class="drawer-title">
-        {{ t('settings.title') }}
+        切换交易所
       </h3>
 
       <div class="drawer-item">
-        <el-radio
-          v-for="(item,index) in list"
-          :key="index"
-          v-model="exchange"
-          :label="item"
-          border
+        <el-space
+          direction="vertical"
+          alignment="flex-start"
         >
-          {{ item }}
-        </el-radio>
+          <el-radio
+            v-for="(item,index) in list"
+            :key="index"
+            v-model="exchange"
+            :label="item"
+            border
+          >
+            {{ item }}
+          </el-radio>
+        </el-space>
       </div>
     </div>
   </div>
@@ -31,15 +36,13 @@
 import { useStore } from '@/store'
 import { SettingsActionTypes } from '@/store/modules/settings/action-types'
 import { UserActionTypes } from '@/store/modules/user/action-types'
-
+import exchanges from '@/config/exchanges'
 import { defineComponent, reactive, toRefs, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   setup() {
-    const list = reactive(['jdex', 'hotcoin-global'])
+    const list = reactive(exchanges)
     const store = useStore()
-    const { t } = useI18n()
     const state = reactive({
       exchange: store.state.user.exchange,
       showTagsView: store.state.settings.showTagsView,
@@ -95,7 +98,6 @@ export default defineComponent({
 
     return {
       list,
-      t,
       ...toRefs(state)
     }
   }

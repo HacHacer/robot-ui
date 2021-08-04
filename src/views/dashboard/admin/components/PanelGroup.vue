@@ -40,7 +40,7 @@
           <div class="card-panel-text">
             机器人运行状态
           </div>
-          <span class="card-panel-num">{{ robotStatus }}</span>
+          <span class="card-panel-num">{{ exchange }}{{ robotStatus }}</span>
         </div>
       </div>
     </el-col>
@@ -54,22 +54,15 @@
         class="card-panel"
         @click="handleSetLineChartData('messages')"
       >
-        <div class="card-panel-icon-wrapper icon-message">
-          <el-button
-            type="primary"
-            icon="el-icon-s-marketing"
-          >
-            查看七日交易量
-          </el-button>
-        </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            24H交易量
+            {{ text }}交易总量
           </div>
           <CountTo
             :start-val="0"
-            :end-val="81212"
+            :end-val="total"
             :duration="3000"
+            decimals="6"
             class="card-panel-num"
           />
         </div>
@@ -85,21 +78,13 @@
         class="card-panel"
         @click="handleSetLineChartData('purchases')"
       >
-        <div class="card-panel-icon-wrapper icon-money">
-          <el-button
-            type="primary"
-            icon="el-icon-s-data"
-          >
-            查看七日交易额度
-          </el-button>
-        </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            24H交易额度
+            {{ text }}交易次数
           </div>
           <CountTo
             :start-val="0"
-            :end-val="9280"
+            :end-val="times"
             :duration="3200"
             class="card-panel-num"
           />
@@ -116,22 +101,15 @@
         class="card-panel"
         @click="handleSetLineChartData('shoppings')"
       >
-        <div class="card-panel-icon-wrapper icon-shopping">
-          <el-button
-            type="primary"
-            icon="el-icon-refresh-right"
-          >
-            查看24H停止次数
-          </el-button>
-        </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            24H机器人停止次数
+            {{ text }}交易均价
           </div>
           <CountTo
             :start-val="0"
-            :end-val="400"
+            :end-val="avgPrice"
             :duration="3600"
+            decimals="6"
             class="card-panel-num"
           />
         </div>
@@ -142,26 +120,75 @@
 
 <script lang="ts">
 import { useStore } from '@/store'
-import { defineComponent, onMounted, ref, watch } from 'vue'
+import { defineComponent, onMounted, reactive, ref, watch, toRefs, computed } from 'vue'
 import { CountTo } from 'vue3-count-to'
-import { robotStatusRequest, stopRobot } from '@/apis/robot'
+import { robotStatusRequest, stopRobot, getTransactionData } from '@/apis/robot'
 import visits from '@/assets/images/home/visits.png'
+import { ElMessage } from 'element-plus'
 export default defineComponent({
+  props: {
+    text: {
+      type!: String,
+      required: true,
+      default: '24H'
+    },
+    value: {
+      type!: String,
+      required: true,
+      default: ''
+    }
+  },
   components: {
     CountTo
   },
   emits: ['handle-set-line-chart-data'],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
+    watch(
+      () => props.value,
+      () => {
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        getTransaction(props.value[0], props.value[1])
+        console.log('value :>> ', props.value)
+      })
     const handleSetLineChartData = (type: string) => {
       emit('handle-set-line-chart-data', type)
     }
     const store = useStore()
+    const exchange = computed(() =>
+      store.state.user.exchange
+    )
     const robotStatus = ref('机器人已停止')
     const myCount = ref(null)
     const getStatus = async() => {
       const data = await robotStatusRequest()
       if (!data?.message) return
       robotStatus.value = data.message
+      ElMessage({
+        message: '成功刷新机器人状态',
+        type: 'success'
+      })
+    }
+    const dataMap = reactive({
+      times: 0,
+      total: 0,
+      avgPrice: 0
+    })
+    const getTransaction = async(startTime: string | Date, endTime: string | Date) => {
+      const t1 = new Date(startTime).getTime()
+      const t2 = new Date(endTime).getTime()
+      const param = {
+        EXCHANGE: store.state.user.exchange,
+        symbol: 'bft_usdt',
+        startTimestamp: t1,
+        endTimestamp: t2
+      }
+      const data = await getTransactionData(param)
+      if (data?.data) {
+        const { transactionTimes, totalAmount, avgPrice } = data.data
+        dataMap.times = +transactionTimes
+        dataMap.total = +totalAmount
+        dataMap.avgPrice = +avgPrice
+      }
     }
     const closeRobot = async() => {
       const a = await stopRobot()
@@ -169,25 +196,40 @@ export default defineComponent({
         await getStatus()
       }
     }
-
+    function get24H() {
+      const start = new Date()
+      const end = new Date()
+      start.setTime(start.getTime() - 3600 * 24 * 1000)
+      getTransaction(start, end)
+    }
     watch(
       () => store.state.user.exchange,
       () => {
         getStatus()
+        if (props.value.length > 0) {
+          getTransaction(props.value[0], props.value[1])
+        } else {
+          get24H()
+        }
+        // getTransaction()
       }
     )
 
     onMounted(() => {
       getStatus()
+      get24H()
+      // getTransaction()
     })
 
     return {
       handleSetLineChartData,
       myCount,
       visits,
+      exchange,
       robotStatus,
       closeRobot,
-      getStatus
+      getStatus,
+      ...toRefs(dataMap)
     }
   }
 })

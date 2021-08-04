@@ -8,9 +8,9 @@
 <template>
   <div>
     <div style="margin-bottom:15px;">
-      {{ t('permission.roles') }}： {{ roles }}
+      权限： {{ roles }}
     </div>
-    {{ t('permission.switchRoles') }}：
+    切换
     <el-radio-group v-model="currentRole">
       <el-radio-button label="editor" />
       <el-radio-button label="admin" />
@@ -21,10 +21,9 @@
 import { useStore } from '@/store'
 import { UserActionTypes } from '@/store/modules/user/action-types'
 import { computed, defineComponent, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+
 export default defineComponent({
   setup() {
-    const { t } = useI18n()
     const store = useStore()
     const roles = computed(() => store.state.user.roles)
     const currentRole = ref(roles.value[0])
@@ -32,7 +31,6 @@ export default defineComponent({
       store.dispatch(UserActionTypes.ACTION_CHANGE_ROLES, value)
     })
     return {
-      t,
       roles,
       currentRole
     }
