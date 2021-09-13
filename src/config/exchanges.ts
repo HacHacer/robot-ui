@@ -1,5 +1,5 @@
-import exchangesUrl from '../../public/config.json'
+const config = require('./config.js')
+console.log('config :>> ', config)
+const exchanges: string[] = Object.keys(config.exchangeConfig)
 
-const exchanges:string[] = Object.keys(exchangesUrl)
-
-export default exchanges 
+export default exchanges

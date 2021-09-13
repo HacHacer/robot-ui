@@ -15,52 +15,22 @@
       label-width="100px"
       class="demo-ruleForm"
     >
-      <el-form-item
-        label="账户1"
-        prop="key1"
-      >
-        <el-select
-          v-model="ruleForm.key1"
-          placeholder="请选择账户1"
-          @change="change($event)"
-        >
-          <template
-            v-for="item in list"
-            :key="item.id"
-          >
-            <el-option
-              v-if="item.id!==ruleForm.key2"
-              :label="item.phone"
-              :value="item.id"
-            />
+      <el-form-item label="账户1" prop="key1">
+        <el-select v-model="ruleForm.key1" placeholder="请选择账户1" @change="change($event)">
+          <template v-for="item in list" :key="item.id">
+            <el-option v-if="item.id !== ruleForm.key2" :label="item.phone" :value="item.id" />
           </template>
         </el-select>
       </el-form-item>
-      <el-form-item
-        label="账户2"
-        prop="key2"
-      >
-        <el-select
-          v-model="ruleForm.key2"
-          placeholder="请选择账户2"
-        >
-          <template
-            v-for="item in list"
-            :key="item.id"
-          >
-            <el-option
-              v-if="item.id!==ruleForm.key1"
-              :label="item.phone"
-              :value="item.id"
-            />
+      <el-form-item label="账户2" prop="key2">
+        <el-select v-model="ruleForm.key2" placeholder="请选择账户2">
+          <template v-for="item in list" :key="item.id">
+            <el-option v-if="item.id !== ruleForm.key1" :label="item.phone" :value="item.id" />
           </template>
         </el-select>
       </el-form-item>
-      <el-form-item
-        label="间隔时间"
-        prop="interval"
-      >
-        <el-select
+      <el-form-item label="间隔时间" prop="interval">
+        <!-- <el-select
           v-model="ruleForm.interval"
           multiple
           filterable
@@ -74,31 +44,30 @@
             :label="item.label"
             :value="item.value"
           />
-        </el-select>
-        <!-- <el-input
+        </el-select>-->
+        <el-input
+          style="width:120px"
           type="age"
           v-model.number="ruleForm.interval"
           autocomplete="off"
-        /> -->
-      </el-form-item>
-      <el-form-item
-        label="Market"
-        prop="market"
-      >
-        <el-select
-          v-model="ruleForm.market"
-          placeholder="请选择Market"
         >
-          <el-option
-            label="bft_usdt"
-            value="bft_usdt"
-          />
+          <template #suffix>秒(s)</template>
+        </el-input>-
+        <el-input
+          type="age"
+          style="width:120px"
+          v-model.number="ruleForm.interval2"
+          autocomplete="off"
+        >
+          <template #suffix>秒(s)</template>
+        </el-input>
+      </el-form-item>
+      <el-form-item label="Market" prop="market">
+        <el-select v-model="ruleForm.market" placeholder="请选择Market">
+          <el-option v-for="(item, index) in markets" :key="index" :label="item" :value="item" />
         </el-select>
       </el-form-item>
-      <el-form-item
-        label="结束时间"
-        required
-      >
+      <el-form-item label="结束时间" required>
         <el-col :span="11">
           <el-form-item prop="date1">
             <el-date-picker
@@ -109,48 +78,25 @@
             />
           </el-form-item>
         </el-col>
-        <el-col
-          class="line"
-          :span="2"
-        />
+        <el-col class="line" :span="2" />
       </el-form-item>
-      <el-form-item
-        label="最小数量"
-        prop="minAmount"
-      >
-        <el-input
-          type="age"
-          v-model.number="ruleForm.minAmount"
-          autocomplete="off"
-        />
+      <el-form-item label="最小数量" prop="minAmount">
+        <el-input type="age" v-model.number="ruleForm.minAmount" autocomplete="off" />
       </el-form-item>
-      <el-form-item
-        label="最大数量"
-        prop="maxAmount"
-      >
-        <el-input
-          type="age"
-          v-model.number="ruleForm.maxAmount"
-          autocomplete="off"
-        />
+      <el-form-item label="最大数量" prop="maxAmount">
+        <el-input type="age" v-model.number="ruleForm.maxAmount" autocomplete="off" />
       </el-form-item>
       <el-form-item>
-        <el-button
-          type="primary"
-          @click="submitForm()"
-        >
-          立即开启
-        </el-button>
-        <el-button @click="resetForm()">
-          重置
-        </el-button>
+        <el-button type="primary" @click="submitForm()">立即开启</el-button>
+        <el-button @click="resetForm()">重置</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script lang="ts">
-import { stopRobot, startAutoTrade, getAllAccounts } from '@/apis/robot'
+import { startAutoTrade, getAllAccounts } from '@/apis/robot'
+import market from '@/config/market'
 import { useStore } from '@/store'
 import { ElForm, ElMessage } from 'element-plus'
 import {
@@ -168,6 +114,7 @@ export default defineComponent({
     const dataForm = ref(ElForm)
     const dataMap = reactive({
       list: [],
+      markets: [],
       options: [{
         value: '20',
         label: '20s'
@@ -184,7 +131,8 @@ export default defineComponent({
         date1: '',
         maxAmount: 300,
         minAmount: 100,
-        interval: '',
+        interval: 200,
+        interval2: 300,
         market: ''
       },
       rules: {
@@ -195,8 +143,9 @@ export default defineComponent({
           { required: true, message: '请选择账户2', trigger: 'change' }
         ],
         interval: [
-          { required: true, message: '请选择时间间隔', trigger: 'change' },
-          // { type: 'number', message: '必须为数字值' }
+          // { required: true, message: '请选择时间间隔', trigger: 'change' }
+          { required: true, message: '不能为空' },
+          { type: 'number', message: '必须为数字值' }
         ],
         maxAmount: [
           { required: true, message: '不能为空' },
@@ -218,13 +167,14 @@ export default defineComponent({
       },
       submitForm() {
         const form = unref(dataForm)
-        form.validate(async(valid: any) => {
+        form.validate(async (valid: any) => {
           if (valid) {
             const accountModle1: any = dataMap.ruleForm
             const accountModle = Object.assign({}, accountModle1)
             accountModle.EXCHANGE = store.state.user.exchange
             accountModle.duration = Date.parse(accountModle.date1)
             accountModle.isPlanning = false
+            accountModle.interval = [accountModle.interval, accountModle.interval2]
             // const arr = [accountModle.interval + '']
             // accountModle.interval = accountModle.interval.value
             // accountModle.timeRange = []
@@ -237,6 +187,7 @@ export default defineComponent({
             delete accountModle?.key1
             delete accountModle?.key2
             delete accountModle?.date1
+            delete accountModle?.interval2
             const result = await startAutoTrade(accountModle)
             if (result?.status === 1) {
               ElMessage({
@@ -265,9 +216,11 @@ export default defineComponent({
         console.log('data :>> ', data)
       }
     })
+    dataMap.markets = market[store.state.user.exchange + '-market']
     watch(
       () => store.state.user.exchange,
       () => {
+        dataMap.markets = market[store.state.user.exchange + '-market']
         dataMap.getList()
       }
     )
